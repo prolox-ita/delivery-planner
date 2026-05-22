@@ -45,11 +45,6 @@ function normalize(str) {
 export function isDuplicate(newStop, existingStops) {
   for (const s of existingStops) {
     if (newStop.placeId && s.placeId && newStop.placeId === s.placeId) return true;
-    if (newStop.coords && s.coords) {
-      const dlat = Math.abs(newStop.coords.lat - s.coords.lat);
-      const dlng = Math.abs(newStop.coords.lng - s.coords.lng);
-      if (dlat < 0.0003 && dlng < 0.0003) return true;
-    }
     if (normalize(newStop.address) === normalize(s.address)) return true;
   }
   return false;
