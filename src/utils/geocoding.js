@@ -10,12 +10,22 @@ export async function searchAddress(query) {
 export function formatAddress(result) {
   const a = result.address || {};
   const road = a.road || a.pedestrian || a.footway || "";
-  const num = a.house_number || "";
+
+  // Nominatim spesso non mette house_number negli indirizzi interpolati,
+  // ma lo include nel display_name subito dopo il nome della via
+  let num = a.house_number || "";
+  if (!num && road && result.display_name) {
+    const parts = result.display_name.split(",").map(p => p.trim());
+    const roadIdx = parts.findIndex(p => p.toLowerCase() === road.toLowerCase());
+    if (roadIdx >= 0 && /^\d+[a-zA-Z]?$/.test(parts[roadIdx + 1] || "")) {
+      num = parts[roadIdx + 1];
+    }
+  }
+
   const city = a.city || a.town || a.village || a.municipality || "";
-  const postcode = a.postcode || "";
+  // Il CAP di Nominatim è spesso quello del comune/area, non dell'indirizzo esatto → non mostrato
   let line = road + (num ? ` ${num}` : "");
   if (city) line += `, ${city}`;
-  if (postcode) line += ` (${postcode})`;
   return line || result.display_name.split(",").slice(0, 3).join(",").trim();
 }
 
