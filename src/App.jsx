@@ -14,13 +14,17 @@ export default function App() {
   const { coords, label: originLabel, status: gpsStatus, errorMsg: gpsError, retry: retryGps } = useGeolocation();
 
   function addStop(address) {
-    setStops(prev => [...prev, { address }]);
+    setStops(prev => [...prev, { address, status: null }]);
     setOptimizedOrder(null);
   }
 
   function removeStop(index) {
     setStops(prev => prev.filter((_, i) => i !== index));
     setOptimizedOrder(null);
+  }
+
+  function markStop(index, status) {
+    setStops(prev => prev.map((s, i) => i === index ? { ...s, status } : s));
   }
 
   async function handleOptimize() {
@@ -47,6 +51,7 @@ export default function App() {
         stops={stops}
         optimizedOrder={optimizedOrder}
         onRemove={removeStop}
+        onMark={markStop}
       />
       <ActionButtons
         canOptimize={stops.length >= 2}
