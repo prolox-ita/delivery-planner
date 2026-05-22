@@ -43,9 +43,5 @@ function normalize(str) {
 }
 
 export function isDuplicate(newStop, existingStops) {
-  for (const s of existingStops) {
-    if (newStop.placeId && s.placeId && newStop.placeId === s.placeId) return true;
-    if (normalize(newStop.address) === normalize(s.address)) return true;
-  }
-  return false;
+  return existingStops.some(s => normalize(newStop.address) === normalize(s.address));
 }
