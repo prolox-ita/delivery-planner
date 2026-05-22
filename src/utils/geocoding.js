@@ -7,13 +7,14 @@ export async function searchAddress(query) {
   return res.json();
 }
 
-export function formatAddress(result) {
+export function formatAddress(result, originalQuery = "") {
   const a = result.address || {};
   const road = a.road || a.pedestrian || a.footway || "";
 
-  // Nominatim spesso non mette house_number negli indirizzi interpolati,
-  // ma lo include nel display_name subito dopo il nome della via
   let num = a.house_number || "";
+
+  // Nominatim non mette house_number per indirizzi interpolati:
+  // prova prima nel display_name subito dopo il nome della via
   if (!num && road && result.display_name) {
     const parts = result.display_name.split(",").map(p => p.trim());
     const roadIdx = parts.findIndex(p => p.toLowerCase() === road.toLowerCase());
@@ -22,8 +23,16 @@ export function formatAddress(result) {
     }
   }
 
+  // Ultimo fallback: estrai il civico dalla query originale dell'utente.
+  // Prende l'ultimo numero nella parte prima della virgola (evita di matchare
+  // numeri civici nelle strade tipo "Via 4 Novembre 12" → prende 12).
+  if (!num && originalQuery) {
+    const streetPart = originalQuery.split(",")[0];
+    const matches = streetPart.match(/\b(\d+[a-zA-Z]?)\b/g);
+    if (matches) num = matches[matches.length - 1];
+  }
+
   const city = a.city || a.town || a.village || a.municipality || "";
-  // Il CAP di Nominatim è spesso quello del comune/area, non dell'indirizzo esatto → non mostrato
   let line = road + (num ? ` ${num}` : "");
   if (city) line += `, ${city}`;
   return line || result.display_name.split(",").slice(0, 3).join(",").trim();

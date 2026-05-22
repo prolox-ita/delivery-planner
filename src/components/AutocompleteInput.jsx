@@ -61,7 +61,7 @@ export default function AutocompleteInput({ onSelect, onCancel, placeholder, sho
 
   function handleSelectResult(result) {
     confirm({
-      address: formatAddress(result),
+      address: formatAddress(result, value),
       coords: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
       placeId: result.place_id,
     });
