@@ -11,7 +11,11 @@ export default function App() {
   const [stops, setStops] = useState([]);
   const [optimizedOrder, setOptimizedOrder] = useState(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [manualOrigin, setManualOrigin] = useState(null);
   const { coords, label: originLabel, status: gpsStatus, errorMsg: gpsError, retry: retryGps } = useGeolocation();
+
+  const effectiveCoords = manualOrigin?.coords ?? coords;
+  const effectiveLabel = manualOrigin?.address ?? originLabel;
 
   function addStop(stopData) {
     setStops(prev => [...prev, { ...stopData, status: null }]);
@@ -31,21 +35,27 @@ export default function App() {
     if (stops.length < 2) return;
     setIsOptimizing(true);
     // TODO: sostituire con chiamata reale a Google Directions API
-    // const order = await googleOptimize(stops, coords);
-    const order = await optimizeStops(stops, coords);
+    const order = await optimizeStops(stops, effectiveCoords);
     setOptimizedOrder(order);
     setIsOptimizing(false);
   }
 
   function handleOpenMaps() {
-    const url = buildMapsUrl(stops, optimizedOrder, originLabel, coords);
+    const url = buildMapsUrl(stops, optimizedOrder, effectiveLabel, effectiveCoords);
     window.open(url, "_blank");
   }
 
   return (
     <div style={{ maxWidth: 420, margin: "0 auto", padding: "1rem" }}>
       <Header />
-      <OriginCard status={gpsStatus} label={originLabel} errorMsg={gpsError} onRetry={retryGps} />
+      <OriginCard
+        status={gpsStatus}
+        label={originLabel}
+        errorMsg={gpsError}
+        onRetry={retryGps}
+        manualOrigin={manualOrigin}
+        onSetManualOrigin={setManualOrigin}
+      />
       <StopInput onAdd={addStop} stops={stops} />
       <StopsList
         stops={stops}
