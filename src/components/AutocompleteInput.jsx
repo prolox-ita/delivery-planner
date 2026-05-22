@@ -13,6 +13,7 @@ export default function AutocompleteInput({ onSelect, onCancel, placeholder, sho
   const [focusedIdx, setFocusedIdx] = useState(-1);
   const timerRef = useRef(null);
   const containerRef = useRef(null);
+  const queryRef = useRef(""); // ref per avere sempre la query più recente nelle closure
 
   useEffect(() => {
     function onClickOutside(e) {
@@ -28,6 +29,7 @@ export default function AutocompleteInput({ onSelect, onCancel, placeholder, sho
   function handleChange(e) {
     const v = e.target.value;
     setValue(v);
+    queryRef.current = v;
     setFocusedIdx(-1);
     clearTimeout(timerRef.current);
     if (v.trim().length < 5) {
@@ -61,7 +63,7 @@ export default function AutocompleteInput({ onSelect, onCancel, placeholder, sho
 
   function handleSelectResult(result) {
     confirm({
-      address: formatAddress(result, value),
+      address: formatAddress(result, queryRef.current),
       coords: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
       placeId: result.place_id,
     });
@@ -137,7 +139,7 @@ export default function AutocompleteInput({ onSelect, onCancel, placeholder, sho
           boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 200, overflow: "hidden",
         }}>
           {suggestions.map((r, idx) => {
-            const main = formatAddress(r);
+            const main = formatAddress(r, queryRef.current);
             const a = r.address || {};
             const secondary = [a.county, a.state].filter(Boolean).join(", ");
             return (
