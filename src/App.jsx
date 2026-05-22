@@ -13,8 +13,8 @@ export default function App() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const { coords, label: originLabel, status: gpsStatus, errorMsg: gpsError, retry: retryGps } = useGeolocation();
 
-  function addStop(address) {
-    setStops(prev => [...prev, { address, status: null }]);
+  function addStop(stopData) {
+    setStops(prev => [...prev, { ...stopData, status: null }]);
     setOptimizedOrder(null);
   }
 
@@ -46,7 +46,7 @@ export default function App() {
     <div style={{ maxWidth: 420, margin: "0 auto", padding: "1rem" }}>
       <Header />
       <OriginCard status={gpsStatus} label={originLabel} errorMsg={gpsError} onRetry={retryGps} />
-      <StopInput onAdd={addStop} />
+      <StopInput onAdd={addStop} stops={stops} />
       <StopsList
         stops={stops}
         optimizedOrder={optimizedOrder}
