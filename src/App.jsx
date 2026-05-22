@@ -1,21 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import OriginCard from "./components/OriginCard";
 import StopInput from "./components/StopInput";
 import StopsList from "./components/StopsList";
+import CurrentStop from "./components/CurrentStop";
 import ActionButtons from "./components/ActionButtons";
 import useGeolocation from "./hooks/useGeolocation";
 import { optimizeStops, buildMapsUrl } from "./utils/routing";
 
+function load(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+
 export default function App() {
-  const [stops, setStops] = useState([]);
-  const [optimizedOrder, setOptimizedOrder] = useState(null);
+  const [stops, setStops] = useState(() => load("stops", []));
+  const [optimizedOrder, setOptimizedOrder] = useState(() => load("optimizedOrder", null));
+  const [manualOrigin, setManualOrigin] = useState(() => load("manualOrigin", null));
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [manualOrigin, setManualOrigin] = useState(null);
   const { coords, label: originLabel, status: gpsStatus, errorMsg: gpsError, retry: retryGps } = useGeolocation();
 
   const effectiveCoords = manualOrigin?.coords ?? coords;
   const effectiveLabel = manualOrigin?.address ?? originLabel;
+
+  useEffect(() => { localStorage.setItem("stops", JSON.stringify(stops)); }, [stops]);
+  useEffect(() => { localStorage.setItem("optimizedOrder", JSON.stringify(optimizedOrder)); }, [optimizedOrder]);
+  useEffect(() => { localStorage.setItem("manualOrigin", JSON.stringify(manualOrigin)); }, [manualOrigin]);
 
   function addStop(stopData) {
     setStops(prev => [...prev, { ...stopData, status: null }]);
@@ -56,6 +65,7 @@ export default function App() {
         manualOrigin={manualOrigin}
         onSetManualOrigin={setManualOrigin}
       />
+      <CurrentStop stops={stops} optimizedOrder={optimizedOrder} onMark={markStop} />
       <StopInput onAdd={addStop} stops={stops} />
       <StopsList
         stops={stops}
