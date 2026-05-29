@@ -12,10 +12,18 @@ async function geocodeAddress(addressText) {
 }
 
 async function fetchRouteGeoJSON(coords) {
+  const body = {
+    coordinates: coords.map(c => [c[1], c[0]]),
+    // Raggio di snap ridotto a 100m (default ORS = 350m): forza l'aggancio
+    // al segmento stradale più vicino all'indirizzo, non a un incrocio lontano
+    radiuses: coords.map(() => 100),
+    // Permette di svoltare a ogni tappa (non "passare dritto" davanti alla via)
+    continue_straight: false,
+  };
   const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': orsApiKey },
-    body: JSON.stringify({ coordinates: coords.map(c => [c[1], c[0]]) }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error('Errore directions');
   return res.json();
