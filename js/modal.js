@@ -6,13 +6,15 @@ function openModal(type) {
   const saveBtn = document.getElementById('modal-save-btn');
 
   if (type === 'settings') {
-    document.getElementById('modal-title').textContent = 'Configura API key';
-    document.getElementById('modal-subtitle').textContent = 'Incolla la tua key gratuita di openrouteservice.';
+    document.getElementById('modal-title').textContent = 'Impostazioni';
+    document.getElementById('modal-subtitle').textContent = 'API key e base di partenza.';
     settingsView.style.display = 'flex';
     deliveryView.style.display = 'none';
     saveBtn.onclick = saveApiKeyFromModal;
     saveBtn.innerHTML = '<i data-lucide="save"></i> Salva key';
     document.getElementById('ors-key-modal').value = orsApiKey;
+    document.getElementById('depot-address').value = depot.address || '';
+    updateDepotStatus(depot.address ? 'Base attuale: ' + depot.address : '', !!depot.address);
   } else {
     document.getElementById('modal-title').textContent = editingId ? 'Modifica consegna' : 'Nuova consegna';
     document.getElementById('modal-subtitle').textContent = 'Inserisci un indirizzo reale da geocodificare.';

@@ -124,6 +124,20 @@
           <i data-lucide="shield-check"></i> Testa key
         </button>
         <div id="key-status" class="notice notice-muted">Nessuna key salvata.</div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:4px 0"/>
+
+        <div style="font-weight:700;font-size:var(--text-sm)">Base di partenza</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="depot-address">Indirizzo</label>
+            <input id="depot-address" type="text" placeholder="Es. Via Roma 1, Bari" autocomplete="off" />
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="align-self:flex-start" onclick="saveDepotFromModal()">
+          <i data-lucide="map-pin"></i> Salva base
+        </button>
+        <div id="depot-status" class="notice notice-muted"></div>
       </div>
 
       <!-- Vista nuova/modifica consegna -->

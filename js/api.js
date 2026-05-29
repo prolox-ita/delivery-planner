@@ -56,6 +56,31 @@ function updateApiKeyButton() {
   btn.className = orsApiKey ? 'btn btn-key-active' : 'btn btn-secondary';
 }
 
+async function saveDepotFromModal() {
+  const address = document.getElementById('depot-address').value.trim();
+  if (!address) { updateDepotStatus('Inserisci un indirizzo.', false); return; }
+  if (!orsApiKey) { updateDepotStatus('Configura prima la API key.', false); return; }
+  updateDepotStatus('Geocodifica in corso…', true);
+  try {
+    const geo = await geocodeAddress(address);
+    depot.address = address;
+    depot.coords  = [geo.lat, geo.lon];
+    depot.name    = 'Base';
+    localStorage.setItem('depot', JSON.stringify(depot));
+    renderAll();
+    updateDepotStatus('Base salvata: ' + geo.label, true);
+  } catch {
+    updateDepotStatus('Indirizzo non trovato. Prova a essere più preciso.', false);
+  }
+}
+
+function updateDepotStatus(msg, ok = false) {
+  const el = document.getElementById('depot-status');
+  if (!el) return;
+  el.className = 'notice ' + (ok ? 'notice-info' : 'notice-muted');
+  el.textContent = msg;
+}
+
 async function testApiKey() {
   if (!orsApiKey) {
     updateKeyStatus('Incolla prima la API key e salvala.', false);
