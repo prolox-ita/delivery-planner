@@ -47,11 +47,10 @@ async function saveDelivery() {
   const address = document.getElementById('f-address').value.trim();
   const city    = document.getElementById('f-city').value.trim();
   if (!name || !address) { alert('Inserisci almeno nome e indirizzo.'); return; }
-  if (!orsApiKey && !document.getElementById('ors-key').value.trim()) {
-    alert('Prima incolla la API key gratuita ORS.');
+  if (!orsApiKey) {
+    alert('Prima configura la API key ORS (bottone in alto).');
     return;
   }
-  saveApiKey();
   const fullAddress = [address, city].filter(Boolean).join(', ');
   try {
     const geo = await geocodeAddress(fullAddress);

@@ -42,11 +42,10 @@ function sortStopsHeuristic(items) {
 }
 
 async function optimizeRoute() {
-  if (!orsApiKey && !document.getElementById('ors-key').value.trim()) {
-    alert('Prima incolla la API key gratuita ORS.');
+  if (!orsApiKey) {
+    alert('Prima configura la API key ORS (bottone in alto).');
     return;
   }
-  saveApiKey();
   const valid = deliveries.filter(d => Array.isArray(d.coords));
   if (!valid.length) { alert('Aggiungi almeno una consegna valida.'); return; }
   setRouteSummary('Calcolo in corso…', 'Sto geocodificando e chiedendo il percorso reale a ORS.');

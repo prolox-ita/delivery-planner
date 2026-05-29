@@ -27,46 +27,29 @@
       </svg>
       <div>
         <div class="logo-text">RoutOpt</div>
-        <div style="font-size:var(--text-xs);color:var(--color-text-muted)">Percorsi reali con ORS + OpenStreetMap</div>
+        <div class="topbar-sub">Percorsi reali con ORS + OpenStreetMap</div>
       </div>
     </div>
     <div class="spacer"></div>
-    <button class="btn btn-secondary" onclick="openModal('settings')"><i data-lucide="key-round"></i> API key</button>
+    <button class="btn btn-secondary" id="btn-api-key" onclick="openModal('settings')">
+      <i data-lucide="key-round"></i><span class="btn-label"> API key</span>
+    </button>
     <button class="btn-ghost" data-theme-toggle aria-label="Tema"></button>
   </header>
 
+  <!-- Sidebar: solo lista consegne -->
   <aside class="sidebar">
-    <div class="stack">
-      <div>
-        <div class="section-title" style="font-size:var(--text-lg)">Configurazione</div>
-        <div class="section-subtitle">Ti basta incollare la key gratuita di openrouteservice.</div>
-      </div>
-      <div class="notice notice-info">
-        <strong style="display:block;margin-bottom:6px">1) Crea la key gratuita</strong>
-        Vai su <a href="https://openrouteservice.org/log-in/" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">openrouteservice.org</a>, registrati e copia la tua API key.
-      </div>
-      <div class="card stack">
-        <div class="form-group">
-          <label for="ors-key">API key ORS</label>
-          <input id="ors-key" class="api-input" type="password" placeholder="Incolla qui la tua API key gratuita" />
-        </div>
-        <div class="inline">
-          <button class="btn btn-primary" onclick="saveApiKey()"><i data-lucide="save"></i> Salva key</button>
-          <button class="btn btn-secondary" onclick="testApiKey()"><i data-lucide="shield-check"></i> Testa key</button>
-        </div>
-        <div id="key-status" class="notice notice-muted">La key resta solo in memoria nel browser aperto, non viene salvata online.</div>
-      </div>
-    </div>
-
     <div class="stack">
       <div class="inline" style="justify-content:space-between">
         <div>
           <div class="section-title" style="font-size:var(--text-lg)">Consegne</div>
           <div class="section-subtitle">Aggiungi indirizzi e ottimizza il giro.</div>
         </div>
-        <button class="btn btn-primary" onclick="newDelivery()"><i data-lucide="plus"></i> Nuova</button>
+        <button class="btn btn-primary" onclick="newDelivery()">
+          <i data-lucide="plus"></i> Nuova
+        </button>
       </div>
-      <div class="inline">
+      <div class="inline sidebar-actions">
         <button class="btn btn-secondary" onclick="optimizeRoute()"><i data-lucide="route"></i> Ottimizza</button>
         <button class="btn btn-secondary" onclick="openInGoogleMaps()"><i data-lucide="map"></i> Google Maps</button>
       </div>
@@ -79,7 +62,7 @@
       <div id="map"></div>
       <div class="route-summary" id="route-summary">
         <strong>Percorso non calcolato</strong>
-        <span>Inserisci la tua API key ORS, aggiungi consegne e premi "Ottimizza".</span>
+        <span>Aggiungi consegne e premi "Ottimizza".</span>
       </div>
     </section>
 
@@ -90,21 +73,34 @@
       </div>
       <div class="kpis" id="kpis"></div>
       <div class="card stack">
-        <div class="inline" style="justify-content:space-between">
-          <div>
-            <div style="font-weight:700">Tappe del giro</div>
-            <div class="section-subtitle">Ordine consigliato per la consegna</div>
-          </div>
-        </div>
+        <div style="font-weight:700">Tappe del giro</div>
+        <div class="section-subtitle">Ordine consigliato per la consegna</div>
         <div class="step-list" id="step-list"></div>
       </div>
     </section>
   </main>
+
+  <!-- Bottom bar visibile solo su mobile -->
+  <nav class="mobile-actions">
+    <button class="mob-btn" onclick="newDelivery()">
+      <i data-lucide="plus-circle"></i><span>Nuova</span>
+    </button>
+    <button class="mob-btn" onclick="optimizeRoute()">
+      <i data-lucide="route"></i><span>Ottimizza</span>
+    </button>
+    <button class="mob-btn" onclick="openInGoogleMaps()">
+      <i data-lucide="navigation"></i><span>Maps</span>
+    </button>
+    <button class="mob-btn" onclick="toggleMap()" id="btn-map-toggle">
+      <i data-lucide="map"></i><span>Mappa</span>
+    </button>
+  </nav>
 </div>
 
+<!-- Modal consegna e impostazioni -->
 <div class="modal-backdrop" id="modal" onclick="closeModalOnBackdrop(event)">
   <div class="modal">
-    <div class="modal-head inline" style="justify-content:space-between;border-bottom:1px solid var(--color-border)">
+    <div class="modal-head inline" style="justify-content:space-between">
       <div>
         <div id="modal-title" style="font-size:var(--text-lg);font-weight:700">Nuova consegna</div>
         <div class="section-subtitle" id="modal-subtitle">Inserisci un indirizzo reale.</div>
@@ -112,18 +108,30 @@
       <button class="btn-ghost" onclick="closeModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
+
+      <!-- Vista impostazioni -->
       <div id="settings-view" class="stack" style="display:none">
-        <div class="notice notice-info">La chiave gratuita si ottiene da openrouteservice. Dopo averla incollata qui, l'app potrà cercare indirizzi e calcolare i percorsi.</div>
+        <div class="notice notice-info">
+          La chiave gratuita si ottiene su
+          <a href="https://openrouteservice.org/log-in/" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">openrouteservice.org</a>.
+          Viene salvata nel browser e non ti viene più chiesta.
+        </div>
         <div class="form-group">
           <label for="ors-key-modal">API key ORS</label>
-          <input id="ors-key-modal" class="api-input" type="password" placeholder="Incolla qui la API key" />
+          <input id="ors-key-modal" class="api-input" type="password" placeholder="Incolla qui la API key" autocomplete="off" />
         </div>
+        <button class="btn btn-secondary" style="align-self:flex-start" onclick="testApiKey()">
+          <i data-lucide="shield-check"></i> Testa key
+        </button>
+        <div id="key-status" class="notice notice-muted">Nessuna key salvata.</div>
       </div>
+
+      <!-- Vista nuova/modifica consegna -->
       <div id="delivery-view" class="stack">
         <div class="form-grid">
           <div class="form-group">
             <label for="f-name">Nome destinatario *</label>
-            <input id="f-name" type="text" placeholder="Es. Mario Rossi" />
+            <input id="f-name" type="text" placeholder="Es. Mario Rossi" autocomplete="off" />
           </div>
           <div class="form-group">
             <label for="f-priority">Priorità</label>
@@ -135,14 +143,14 @@
           </div>
           <div class="form-group full">
             <label for="f-address">Indirizzo *</label>
-            <input id="f-address" type="text" placeholder="Es. Via Sparano 12, Bari" />
+            <input id="f-address" type="text" placeholder="Es. Via Sparano 12, Bari" autocomplete="off" />
           </div>
           <div class="form-group">
             <label for="f-city">Città</label>
-            <input id="f-city" type="text" placeholder="Es. Bari" />
+            <input id="f-city" type="text" placeholder="Es. Bari" autocomplete="off" />
           </div>
           <div class="form-group">
-            <label for="f-time">Orario</label>
+            <label for="f-time">Orario preferito</label>
             <input id="f-time" type="time" />
           </div>
           <div class="form-group full">
@@ -151,10 +159,13 @@
           </div>
         </div>
       </div>
+
     </div>
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
-      <button class="btn btn-primary" id="modal-save-btn" onclick="saveDelivery()"><i data-lucide="save"></i> Salva</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveDelivery()">
+        <i data-lucide="save"></i> Salva
+      </button>
     </div>
   </div>
 </div>

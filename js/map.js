@@ -29,3 +29,11 @@ function setRouteSummary(title, text) {
   document.getElementById('route-summary').innerHTML =
     `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(text)}</span>`;
 }
+
+function toggleMap() {
+  const wrap = document.querySelector('.map-wrap');
+  const hidden = wrap.classList.toggle('map-hidden');
+  const btn = document.getElementById('btn-map-toggle');
+  if (btn) btn.classList.toggle('active', hidden);
+  if (!hidden) map.invalidateSize();
+}

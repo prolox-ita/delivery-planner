@@ -1,5 +1,5 @@
 // Stato globale condiviso tra tutti i moduli
-let orsApiKey = '';
+let orsApiKey = localStorage.getItem('orsApiKey') || '';
 let deliveries = [];
 let editingId = null;
 let nextId = 1;

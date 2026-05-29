@@ -2,4 +2,5 @@
 initMap();
 addDemoData();
 renderAll();
-setRouteSummary('Pronta per partire', 'Incolla la key ORS, poi premi "Ottimizza" per calcolare il percorso reale.');
+updateApiKeyButton();
+setRouteSummary('Pronta per partire', 'Aggiungi consegne e premi "Ottimizza" per calcolare il percorso reale.');
